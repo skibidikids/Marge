@@ -1,0 +1,44 @@
+name: Build Marge Exe
+
+# "main" ブランチにコードが push (更新) されたら動く設定
+on:
+  push:
+    branches: [ "main" ]
+  # 手動でも実行できるようにするボタンを追加
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest  # Windows環境のサーバーを借りる
+
+    steps:
+    # 1. リポジトリのコードをチェックアウト（ダウンロード）
+    - uses: actions/checkout@v4
+
+    # 2. Pythonのセットアップ
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12" # お使いのバージョンに合わせる
+
+    # 3. 必要なライブラリのインストール
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        # requirements.txt があればインストール、なければ直接必要なものを入れる
+        if (Test-Path requirements.txt) { pip install -r requirements.txt }
+        # requirements.txtがない場合のための保険（Margeで使っているライブラリ）
+        # pip install img2pdf pypdf pillow
+
+    # 4. PyInstallerでExe化実行
+    - name: Build with PyInstaller
+      # Marge_PDF.py を exe に変換します
+      run: pyinstaller Marge_PDF.py --onefile --noconsole --name "MargeTool"
+
+    # 5. 完成したExeをGitHub上にアップロード
+    - name: Upload Exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: MargeTool-exe  # ダウンロード時のzipファイル名
+        path: dist/*.exe
