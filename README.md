@@ -16,7 +16,9 @@
 3.  **セキュリティ対策**
     配布時のアンチウイルスソフト（ApexOne等）誤検知問題に対し、**Inno Setup** を用いたインストーラー形式でのパッケージング手法を確立し、現場へのスムーズな導入を実現しました。
 
-## ⚙️ 処理フロー
+## ⚙️ 処理フロー (Runtime)
+
+実際にツールが動作する際のデータ処理の流れです。
 
 ```mermaid
 graph LR
@@ -24,6 +26,18 @@ graph LR
     Config["config.ini"] -.->|設定読込| Script
     Script -->|変換・結合| PDF["結合されたPDF"]
     PDF -->|受渡| RPA["WinActor / 業務フロー"]
+```
+
+## 🏗 ビルドと配布 (Deployment)
+
+開発環境からユーザー環境（現場PC）へ、安全かつ確実にツールを届けるためのフローです。
+**Inno Setup** を採用することで、誤検知回避と設定ファイルの同梱を自動化しています。
+
+```mermaid
+graph LR
+    GitHub -->|CI/CD| Exe["Exeファイル<br>(PyInstaller)"]
+    Exe -->|パッケージング| Installer["インストーラー<br>(Inno Setup)"]
+    Installer -->|配布・インストール| UserPC["現場PC / RPA"]
 ```
 
 ## 📦 機能
@@ -64,24 +78,6 @@ InputDirectory = ./input
 OutputDirectory = ./output
 # 必要に応じて設定項目を記述
 ```
-
-## 🏗 ビルドとデプロイ (CI/CD)
-
-本リポジトリは **GitHub Actions** により、Pushごとの自動ビルド環境が構築されています。
-
-### 1. 自動ビルド (推奨)
-GitHubの **[Actions]** タブから、ビルドの成功履歴を確認できます。
-各ビルドの概要ページ下部にある **Artifacts** から、生成された `MargeTool-exe` をダウンロード可能です。
-
-### 2. 手動ビルド手順
-ローカル環境で開発ビルドを行う場合は、PyInstallerを使用します。
-
-```bash
-# Exe化
-pyinstaller Marge_PDF.py --onefile --noconsole --name "MargeTool"
-```
-
-その後、必要に応じて **Inno Setup** スクリプトを実行し、配布用インストーラーを作成します。
 
 ## 📝 License
 
