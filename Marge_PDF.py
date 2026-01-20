@@ -154,4 +154,4 @@ if __name__ == '__main__':
         clear_directory_contents(capture_directory)
         clear_directory_contents(pdfs_directory)
         print("\nクリーンアップが完了しました。")
-
+        
