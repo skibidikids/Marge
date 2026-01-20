@@ -34,9 +34,9 @@ graph LR
 
 ## 🛠 動作環境
 
-* OS: Windows 10 / 11
+* OS: Windows 11
 * Python: 3.13.9
-* RPAツール: WinActor (必須ではありません)
+* RPAツール: WinActor
 
 ## 📖 使い方
 
