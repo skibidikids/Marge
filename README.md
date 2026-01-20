@@ -1,6 +1,6 @@
 # Marge PDF Tool 📄
 
-![Python](https://img.shields.io/badge/Python-3.x-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Build Status](https://github.com/skibidikids/Marge/actions/workflows/build.yml/badge.svg) ![Python](https://img.shields.io/badge/Python-3.x-blue.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
 業務自動化（RPA）シナリオにおいて、画像のPDF化と結合（マージ）を自動で行うPythonツールです。
 **WinActor** などのRPAツールと連携し、複雑なファイル操作を高速かつ安定して処理するために開発されました。
@@ -10,17 +10,20 @@
 1.  **RPAの機能補完**
     WinActor単体では実装が複雑になりがちな「可変長の画像ファイル結合」を、Pythonスクリプトでシンプルに実装し、処理速度とメンテナンス性を向上させました。
 
-2.  **配布時のセキュリティ問題解決**
-    PyInstallerでexe化した際に発生する「アンチウイルスソフト（ApexOne等）の誤検知」に対し、**Inno Setup** を用いたインストーラー形式での配布を採用することで回避。現場へのスムーズな導入を実現しました。
+2.  **DevOps（自動ビルド・配布）の実現**
+    GitHub ActionsによるCI/CDパイプラインを構築。コードが更新されると自動的にExeファイルが生成される仕組みを導入し、手動ビルドの手間と人的ミスを排除しました。
+
+3.  **セキュリティ対策**
+    配布時のアンチウイルスソフト（ApexOne等）誤検知問題に対し、**Inno Setup** を用いたインストーラー形式でのパッケージング手法を確立し、現場へのスムーズな導入を実現しました。
 
 ## ⚙️ 処理フロー
 
 ```mermaid
 graph LR
-    Input[画像フォルダ] -->|読み込み| Script[Marge_PDF.py]
-    Config[config.ini] -.->|設定読込| Script
-    Script -->|変換・結合| PDF[結合されたPDF]
-    PDF -->|受渡| RPA[WinActor / 業務フロー]
+    Input["画像フォルダ"] -->|読み込み| Script["Marge_PDF.py"]
+    Config["config.ini"] -.->|設定読込| Script
+    Script -->|変換・結合| PDF["結合されたPDF"]
+    PDF -->|受渡| RPA["WinActor / 業務フロー"]
 ```
 
 ## 📦 機能
@@ -31,7 +34,7 @@ graph LR
 
 ## 🛠 動作環境
 
-* OS: Windows 10
+* OS: Windows 10 / 11
 * Python: 3.13.9
 * RPAツール: WinActor (必須ではありません)
 
@@ -45,8 +48,7 @@ git clone [https://github.com/skibidikids/Marge.git](https://github.com/skibidik
 cd Marge
 
 # 必要なライブラリのインストール
-# (コード内のimportに合わせて必要なものを入れてください)
-# pip install img2pdf pypdf
+# pip install img2pdf pypdf pillow
 
 # 実行
 python Marge_PDF.py
@@ -63,18 +65,23 @@ OutputDirectory = ./output
 # 必要に応じて設定項目を記述
 ```
 
-## 🏗 配布用ビルド手順 (DevOps)
+## 🏗 ビルドとデプロイ (CI/CD)
 
-開発環境からエンドユーザー（現場）へ配布するためのフローです。
+本リポジトリは **GitHub Actions** により、Pushごとの自動ビルド環境が構築されています。
 
-1.  **Exe化**: `PyInstaller` を使用して単一実行ファイルを作成。
-2.  **インストーラー作成**: `Inno Setup` を使用し、exe本体と `config.ini`、マニュアルをパッケージング。
-3.  **配布**: 生成された `setup.exe` をユーザーに配布（署名問題や誤検知を回避）。
+### 1. 自動ビルド (推奨)
+GitHubの **[Actions]** タブから、ビルドの成功履歴を確認できます。
+各ビルドの概要ページ下部にある **Artifacts** から、生成された `MargeTool-exe` をダウンロード可能です。
+
+### 2. 手動ビルド手順
+ローカル環境で開発ビルドを行う場合は、PyInstallerを使用します。
 
 ```bash
-# PyInstallerでのビルド例
-pyinstaller Marge_PDF.py --onefile --noconsole --name "MargePDF"
+# Exe化
+pyinstaller Marge_PDF.py --onefile --noconsole --name "MargeTool"
 ```
+
+その後、必要に応じて **Inno Setup** スクリプトを実行し、配布用インストーラーを作成します。
 
 ## 📝 License
 
